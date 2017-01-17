@@ -12,35 +12,40 @@
 
 </head>
 <body ng-app="iotSample" class="container">
+	<div ng-controller="ledController as ctrl">
 
 	<div class="row"><strong class="col-md-6">Toggle LED light on or off</strong>
 	<div ng-controller="ledController" class="col-md-6">
-		<button class="btn btn-lg active" ng-class="buttonClass" ng-click="toggleLedLight()"> {{buttonLabel}} </button>		
+		<button class="btn btn-lg active" ng-class="ctrl.buttonClass" ng-click="ctrl.toggleLedLight()"> {{ctrl.buttonLabel}} </button>		
 
 
 	</div>
 	</div>
-
+</div>
 
 	<script type="text/javascript">
 		angular.module('iotSample', ['firebase'])
 		.controller('ledController', function($scope, $firebaseObject){
-			$scope.switchLedOn = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
+			$scope.switchLedOn;
+			$scope.ledColor;
 
-			function setSwitchLabel(){
-				$scope.buttonLabel = $scope.switchLedOn.$value ? 'Switch It Off' : 'Switch It On';
-				$scope.buttonClass = $scope.switchLedOn.$value ? 'btn-primary': '';
-
+			this.activate = function(){
+				$scope.switchLedOn = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
+				this.setSwitchLabel();
+				$scope.switchLedOn.$bindTo($scope, 'switchLedOn');
+			}
+	
+			this.setSwitchLabel = function(){
+				this.buttonLabel = $scope.switchLedOn.$value ? 'Switch It Off' : 'Switch It On';
+				this.buttonClass = $scope.switchLedOn.$value ? 'btn-primary': '';
 			}
 
-			setSwitchLabel();
-
-			$scope.toggleLedLight = function(){
+			this.toggleLedLight = function(){
 				$scope.switchLedOn.$value = !$scope.switchLedOn.$value;
-				setSwitchLabel();
+				this.setSwitchLabel();
 			}
 
-			$scope.switchLedOn.$bindTo($scope, 'switchLedOn');
+			this.activate();		
 		});
 	</script>
 
