@@ -1,0 +1,24 @@
+{
+  "name": "IoT-TrafficLight",
+  "homepage": "https://github.com/TomHoekstra/IoT-TrafficLight",
+  "authors": [
+    "Tom Hoekstra <tom-1509@hotmail.com>"
+  ],
+  "description": "Spir-it TrafficLight with RaspberryPi",
+  "main": "",
+  "keywords": [
+    "IoT",
+    "RaspberryPi",
+    "Led",
+    "Angular"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
