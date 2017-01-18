@@ -14,17 +14,17 @@
 </head>
 <body ng-app="iotSample" class="container">
     <div ng-controller="ledController as ctrl" ng-cloak="">
-		
+
 
         <div class="col-md-3"></div>
-        <div class="col-md-6">
-			<nav class="navbar navbar-default">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<a class="navbar-brand" href="#">IoT Trafficlight</a>
-					</div>
-				</div>
-			</nav>
+        <div class="col-md-6 col-xs-18">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#">IoT Trafficlight</a>
+                    </div>
+                </div>
+            </nav>
             <div class="panel panel-default">
                 <div class="panel-heading">Current state</div>
                 <div class="panel-body">
@@ -43,80 +43,80 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Switch it up!</div>
                 <div class="panel-body">
-					<fieldset>
-						<label>Toggle trafficlight on or off</label>
-						<br/>
-						<button class="btn active btn-sm" ng-class="ledStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="ledStatusObject.$value = !ledStatusObject.$value"> {{ledStatusObject.$value === true ? 'Turn it off' : 'Turn it on'}} </button>
-					</fieldset>
-					<fieldset>
-						<label>Select your color</label><br/>
-						<button class="btn active btn-sm btn-danger" ng-click="ledColorObject.$value = 'red'">Red!</button>
-						<button class="btn active btn-sm btn-warning" ng-click="ledColorObject.$value = 'yellow'">Yellow!</button>
-						<button class="btn active btn-sm btn-success" ng-click="ledColorObject.$value = 'green'">Green!</button>
-					</fieldset>
-					<fieldset>
-						<label>Select a time for the next meeting</label><br/>
-  						<input type="text" placeholder="HH:MM" ng-model="ctrl.time">
-						<button class="btn active btn-sm btn-success" ng-click="ctrl.postTime()">Post it!</button>
-					</fieldset>
-					<fieldset>
-						<label>Buzz!</label>
-						<br/>
-						<button class="btn active btn-sm" ng-class="buzzerStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="buzzerStatusObject.$value = true"> {{buzzerStatusObject.$value === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
-					</fieldset>
-					<fieldset>
-						<label>Buzz!</label>
-						<br/>
-						<button class="btn active btn-sm btn-info"  ng-click="surpriseObject.$value = true"> {{surpriseObject.$value === false ? '???' : 'Airhorn!'}}</button>
-					</fieldset>
-</div>
-
+                    <fieldset>
+                        <label>Toggle trafficlight on or off</label>
+                        <br />
+                        <button class="btn active btn-sm" ng-class="ledStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="ledStatusObject.$value = !ledStatusObject.$value"> {{ledStatusObject.$value === true ? 'Turn it off' : 'Turn it on'}} </button>
+                    </fieldset>
+                    <fieldset>
+                        <label>Select your color</label><br />
+                        <button class="btn active btn-sm btn-danger" ng-click="ledColorObject.$value = 'red'">Red!</button>
+                        <button class="btn active btn-sm btn-warning" ng-click="ledColorObject.$value = 'yellow'">Yellow!</button>
+                        <button class="btn active btn-sm btn-success" ng-click="ledColorObject.$value = 'green'">Green!</button>
+                    </fieldset>
+                    <fieldset>
+                        <label>Select a time for the next meeting</label><br />
+                        <input type="text" placeholder="HH:MM" ng-model="ctrl.time">
+                        <button class="btn active btn-sm btn-success" ng-click="ctrl.postTime()">Post it!</button>
+                    </fieldset>
+                    <fieldset>
+                        <label>Buzz!</label>
+                        <br />
+                        <button class="btn active btn-sm" ng-class="buzzerStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="buzzerStatusObject.$value = true"> {{buzzerStatusObject.$value === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
+                    </fieldset>
+                    <fieldset>
+                        <label>Buzz!</label>
+                        <br />
+                        <button class="btn active btn-sm btn-info" ng-click="surpriseObject.$value = true"> {{surpriseObject.$value === false ? '???' : 'Airhorn!'}}</button>
+                    </fieldset>
                 </div>
+
             </div>
             <footer>
-				<center>
-				<img class="img_footer" src="img/firebase.png" alt="firebase"/>
-				<img class="img_footer" src="img/angularjs.png" alt="firebase"/>
-				<img class="img_footer" src="img/python.png" alt="firebase"/>
-				<img class="img_footer" src="img/vscode.ico" alt="firebase"/>
-				<img class="img_footer" src="img/raspberrypi.png" alt="firebase"/>
-				</center>
-			</footer>
-        </div>
-    </div>
-    <div class="col-md-3 col-xs-18"></div>
 
+                <img class="img_footer" src="img/firebase.png" alt="firebase" />
+                <img class="img_footer" src="img/angularjs.png" alt="firebase" />
+                <img class="img_footer" src="img/python.png" alt="firebase" />
+                <img class="img_footer" src="img/vscode.ico" alt="firebase" />
+                <img class="img_footer" src="img/raspberrypi.png" alt="firebase" />
+            </footer>
+        </div>
+
+
+
+        <div class="col-md-3"></div>
+    </div>
     <script type="text/javascript">
         angular.module('iotSample', ['firebase'])
         .controller('ledController', function ($scope, $firebaseObject) {
             $scope.ledStatusObject;
             $scope.ledColorObject;
-			$scope.buzzerStatusObject;
-			$scope.buzzerTimeObject;
-			$scope.surpriseObject;
+            $scope.buzzerStatusObject;
+            $scope.buzzerTimeObject;
+            $scope.surpriseObject;
 
-			this.time;
-			
+            this.time;
+
             this.activate = function () {
                 $scope.ledStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
                 $scope.ledStatusObject.$bindTo($scope, 'ledStatusObject');
-				
+
                 $scope.ledColorObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LedColor'))
                 $scope.ledColorObject.$bindTo($scope, 'ledColorObject');
-                
-				$scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
-                $scope.buzzerStatusObject.$bindTo($scope, 'buzzerStatusObject');
-				
-				$scope.buzzerTimeObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/BuzzerTime'))
-                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');		
 
-				$scope.surpriseObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Surprise'))
-                $scope.surpriseObject.$bindTo($scope, 'surpriseObject');				
+                $scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
+                $scope.buzzerStatusObject.$bindTo($scope, 'buzzerStatusObject');
+
+                $scope.buzzerTimeObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/BuzzerTime'))
+                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');
+
+                $scope.surpriseObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Surprise'))
+                $scope.surpriseObject.$bindTo($scope, 'surpriseObject');
             }
-			
-			this.postTime = function(){
-				$scope.buzzerTimeObject.$value = this.time;
-			}
+
+            this.postTime = function () {
+                $scope.buzzerTimeObject.$value = this.time;
+            }
 
 
             this.activate();
