@@ -1,53 +1,93 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Remote Control LED</title>
+    <title>Remote Control LED</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-	
-	<script src="bower_components/angular/angular.min.js"></script>
-	<script src="bower_components/firebase/firebase.js"></script>
-	<script src="bower_components/angularfire/dist/angularfire.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/firebase/firebase.js"></script>
+    <script src="bower_components/angularfire/dist/angularfire.min.js"></script>
 
 </head>
 <body ng-app="iotSample" class="container">
-	<div ng-controller="ledController as ctrl">
-
-	<div class="row"><strong class="col-md-6">Toggle LED light on or off</strong>
-	<div ng-controller="ledController" class="col-md-6">
-		<button class="btn btn-lg active" ng-class="ctrl.buttonClass" ng-click="ctrl.toggleLedLight()"> {{ctrl.buttonLabel}} </button>		
+    <div ng-controller="ledController as ctrl" ng-cloak="">
 
 
-	</div>
-	</div>
-</div>
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <header>
+                <h1>
+                    IoT Trafficlight
+                </h1>
+            </header>
+            <div class="panel panel-default">
+                <div class="panel-heading">Current state</div>
+                <div class="panel-body">
+                    <div class="clear">
+                        <div class="left">Current light:</div> <div name="current_light" id="current_light" class="circle left" ng-class="ledStatusObject.$value === false ? 'black' : ledColorObject.$value"></div>
+                        <div class="clear">
+                            <div class="left">Buzzer status:</div> <div name="buzzer_status" id="buzzer_status" class="left">{{buzzerStatusObject.$value === true ? 'On' : 'Off'}}</div><br />
+                            <div class="clear">
+                                <div class="left">Next buzzer:</div> <div name="next_buzzer" id="next_buzzer" class="left">{{buzzerTimeObject.$value}}</div><br />
+                            </div>
+                        </div>
 
-	<script type="text/javascript">
-		angular.module('iotSample', ['firebase'])
-		.controller('ledController', function($scope, $firebaseObject){
-			$scope.switchLedOn;
-			$scope.ledColor;
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">Switch it up!</div>
+                <div class="panel-body">
+                    <strong class="col-md-6">Toggle LED light on or off</strong>
+                    <button class="btn btn-lg active" ng-click="ctrl.toggleLedLight()"> {{ctrl.buttonLabel}} </button>
+                </div>
+            </div>
+            <footer></footer>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-18"></div>
 
-			this.activate = function(){
-				$scope.switchLedOn = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
-				this.setSwitchLabel();
-				$scope.switchLedOn.$bindTo($scope, 'switchLedOn');
-			}
-	
-			this.setSwitchLabel = function(){
-				this.buttonLabel = $scope.switchLedOn.$value ? 'Switch It Off' : 'Switch It On';
-				this.buttonClass = $scope.switchLedOn.$value ? 'btn-primary': '';
-			}
+    <script type="text/javascript">
+        angular.module('iotSample', ['firebase'])
+        .controller('ledController', function ($scope, $firebaseObject) {
+            $scope.ledStatusObject;
+            $scope.ledColorObject;
+			$scope.buzzerStatusObject;
+			$scope.buzzerTimeObject;
 
-			this.toggleLedLight = function(){
-				$scope.switchLedOn.$value = !$scope.switchLedOn.$value;
-				this.setSwitchLabel();
-			}
+            this.buttonLabel;
 
-			this.activate();		
-		});
-	</script>
+
+
+            this.activate = function () {
+                $scope.ledStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
+                $scope.ledStatusObject.$bindTo($scope, 'ledStatusObject');
+                $scope.ledColorObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LedColor'))
+                $scope.ledColorObject.$bindTo($scope, 'ledColorObject');
+                $scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
+                $scope.buzzerStatusObject.$bindTo($scope, 'buzzerStatusObject');
+				$scope.buzzerTimeObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/BuzzerTime'))
+                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');
+
+
+                this.setSwitchLabel();
+            }
+
+            this.setSwitchLabel = function () {
+                this.buttonLabel = $scope.ledStatusObject.$value ? 'Switch It Off' : 'Switch It On';
+            }
+
+            this.toggleLedLight = function () {
+                $scope.ledStatusObject.$value = !$scope.ledStatusObject.$value;
+                this.setSwitchLabel();
+            }
+
+            this.activate();
+        });
+    </script>
 
 </body>
 </html>

@@ -1,0 +1,32 @@
+.circle {
+	width: 20px;
+	height: 20px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+}
+
+.red{
+    background: red;
+}
+
+.yellow{
+    background: yellow;
+}
+
+.green{
+    background: green;
+}
+
+.black{
+    background: black;
+}
+
+.left{
+    float: left;
+}
+
+.clear{
+    clear: both;
+}
+
