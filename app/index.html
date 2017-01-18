@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Remote Control LED</title>
+    <title>Remote Control Trafficlight</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
@@ -14,15 +14,17 @@
 </head>
 <body ng-app="iotSample" class="container">
     <div ng-controller="ledController as ctrl" ng-cloak="">
-
+		
 
         <div class="col-md-3"></div>
         <div class="col-md-6">
-            <header>
-                <h1>
-                    IoT Trafficlight
-                </h1>
-            </header>
+			<nav class="navbar navbar-default">
+				<div class="container-fluid">
+					<div class="navbar-header">
+						<a class="navbar-brand" href="#">IoT Trafficlight</a>
+					</div>
+				</div>
+			</nav>
             <div class="panel panel-default">
                 <div class="panel-heading">Current state</div>
                 <div class="panel-body">
@@ -41,8 +43,34 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Switch it up!</div>
                 <div class="panel-body">
-                    <strong class="col-md-6">Toggle LED light on or off</strong>
-                    <button class="btn btn-lg active" ng-click="ctrl.toggleLedLight()"> {{ctrl.buttonLabel}} </button>
+					<fieldset>
+						<label>Toggle trafficlight on or off</label>
+						<br/>
+						<button class="btn active btn-sm" ng-class="ledStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="ledStatusObject.$value = !ledStatusObject.$value"> {{ledStatusObject.$value === true ? 'Turn it off' : 'Turn it on'}} </button>
+					</fieldset>
+					<fieldset>
+						<label>Select your color</label><br/>
+						<button class="btn active btn-sm btn-danger" ng-click="ledColorObject.$value = 'red'">Red!</button>
+						<button class="btn active btn-sm btn-warning" ng-click="ledColorObject.$value = 'yellow'">Yellow!</button>
+						<button class="btn active btn-sm btn-success" ng-click="ledColorObject.$value = 'green'">Green!</button>
+					</fieldset>
+					<fieldset>
+						<label>Select a time for the next meeting</label><br/>
+  						<input type="text" placeholder="HH:MM" ng-model="ctrl.time">
+						<button class="btn active btn-sm btn-success" ng-click="ctrl.postTime()">Post it!</button>
+					</fieldset>
+					<fieldset>
+						<label>Buzz!</label>
+						<br/>
+						<button class="btn active btn-sm" ng-class="buzzerStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="buzzerStatusObject.$value = true"> {{buzzerStatusObject.$value === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
+					</fieldset>
+					<fieldset>
+						<label>Buzz!</label>
+						<br/>
+						<button disabled class="btn active btn-sm btn-info"  ng-click="surpriseObject.$value = true"> {{surpriseObject.$value === false ? '???' : 'Airhorn!'}}</button>
+					</fieldset>
+</div>
+
                 </div>
             </div>
             <footer></footer>
@@ -57,33 +85,31 @@
             $scope.ledColorObject;
 			$scope.buzzerStatusObject;
 			$scope.buzzerTimeObject;
+			$scope.surpriseObject;
 
-            this.buttonLabel;
-
-
-
+			this.time;
+			
             this.activate = function () {
                 $scope.ledStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
                 $scope.ledStatusObject.$bindTo($scope, 'ledStatusObject');
+				
                 $scope.ledColorObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LedColor'))
                 $scope.ledColorObject.$bindTo($scope, 'ledColorObject');
-                $scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
+                
+				$scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
                 $scope.buzzerStatusObject.$bindTo($scope, 'buzzerStatusObject');
+				
 				$scope.buzzerTimeObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/BuzzerTime'))
-                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');
+                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');		
 
-
-                this.setSwitchLabel();
+				$scope.surpriseObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Surprise'))
+                $scope.surpriseObject.$bindTo($scope, 'surpriseObject');				
             }
+			
+			this.postTime = function(){
+				$scope.buzzerTimeObject.$value = this.time;
+			}
 
-            this.setSwitchLabel = function () {
-                this.buttonLabel = $scope.ledStatusObject.$value ? 'Switch It Off' : 'Switch It On';
-            }
-
-            this.toggleLedLight = function () {
-                $scope.ledStatusObject.$value = !$scope.ledStatusObject.$value;
-                this.setSwitchLabel();
-            }
 
             this.activate();
         });
