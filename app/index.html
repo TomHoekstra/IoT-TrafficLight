@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Remote Control Trafficlight</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +13,7 @@
     <script src="bower_components/angularfire/dist/angularfire.min.js"></script>
 
 </head>
+
 <body ng-app="iotSample" class="container">
     <div ng-controller="ledController as ctrl" ng-cloak="">
 
@@ -29,11 +31,14 @@
                 <div class="panel-heading">Current state</div>
                 <div class="panel-body">
                     <div class="clear">
-                        <div class="left">Current light:</div> <div name="current_light" id="current_light" class="circle left" ng-class="ledStatusObject.$value === false ? 'black' : ledColorObject.$value"></div>
+                        <div class="left">Current light:</div>
+                        <div name="current_light" id="current_light" class="circle left" ng-class="ledStatusObject.$value === false ? 'black' : ledColorObject.$value"></div>
                         <div class="clear">
-                            <div class="left">Buzzer status:</div> <div name="buzzer_status" id="buzzer_status" class="left">{{buzzerStatusObject.$value === true ? 'On' : 'Off'}}</div><br />
+                            <div class="left">Buzzer status:</div>
+                            <div name="buzzer_status" id="buzzer_status" class="left">{{buzzerStatusObject.$value === true ? 'On' : 'Off'}}</div><br />
                             <div class="clear">
-                                <div class="left">Next buzzer:</div> <div name="next_buzzer" id="next_buzzer" class="left">{{buzzerTimeObject.$value}}</div><br />
+                                <div class="left">Next buzzer:</div>
+                                <div name="next_buzzer" id="next_buzzer" class="left">{{buzzerTimeObject.$value}}</div><br />
                             </div>
                         </div>
 
@@ -71,6 +76,8 @@
                     </fieldset>
                 </div>
 
+                <button class="btn active btn-sm btn-info" ng-click="ctrl.signIn()"> Sign in</button> {{user}}
+
             </div>
             <footer>
 
@@ -86,16 +93,41 @@
 
         <div class="col-md-3"></div>
     </div>
+    <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
+    <script>
+    // Initialize Firebase
+
+    </script>
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
+
+
     <script type="text/javascript">
         angular.module('iotSample', ['firebase'])
-        .controller('ledController', function ($scope, $firebaseObject) {
+        .controller('ledController', function ($scope, $firebaseObject, $firebaseAuth) {
             $scope.ledStatusObject;
             $scope.ledColorObject;
             $scope.buzzerStatusObject;
             $scope.buzzerTimeObject;
             $scope.surpriseObject;
+            
+            var provider = new firebase.auth.GoogleAuthProvider();
 
             this.time;
+
+            this.user;
+
+                var config = {
+        apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
+        authDomain: "spirit-pi.firebaseapp.com",
+        databaseURL: "https://spirit-pi.firebaseio.com",
+        storageBucket: "spirit-pi.appspot.com",
+        messagingSenderId: "508973370880"
+    };
+    
 
             this.activate = function () {
                 $scope.ledStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
@@ -111,17 +143,40 @@
                 $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');
 
                 $scope.surpriseObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Surprise'))
-                $scope.surpriseObject.$bindTo($scope, 'surpriseObject');
+                $scope.surpriseObject.$bindTo($scope, 'surpriseObject'); 
+                
+                firebase.initializeApp(config);
             }
 
             this.postTime = function () {
                 $scope.buzzerTimeObject.$value = this.time;
             }
 
+            this.signIn = function() {
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                var token = result.credential.accessToken;
+                // The signed-in user info.
+                var user = result.user;
+                // ...
+                }).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+                // ...
+                });
+            }
+
 
             this.activate();
+
         });
     </script>
 
 </body>
+
 </html>
