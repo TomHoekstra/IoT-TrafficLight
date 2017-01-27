@@ -4,12 +4,18 @@
 <head>
     <title>Remote Control Trafficlight</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="508973370880-if0a3nc07fesbeka8lm4hrlo9araf2o4.apps.googleusercontent.com">
 
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/firebase/firebase.js"></script>
+
+    <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
+    <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
 </head>
 
@@ -23,6 +29,16 @@
                 <div class="container-fluid">
                     <div class="navbar-header">
                         <a class="navbar-brand" href="#">IoT Trafficlight</a>
+                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                        <a href="#" onclick="signOut();">Sign out</a>
+<script>
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log('User signed out.');
+    });
+  }
+</script>
                     </div>
                 </div>
             </nav>
@@ -66,11 +82,12 @@
                     <fieldset>
                         <label>Buzz!</label>
                         <br />
-                        <button class="btn active btn-sm" ng-class="ctrl.buzzerStatus === true ? 'btn-danger' : 'btn-success'" ng-click="ctrl.setBuzzerStatus()" ng-disabled="ctrl.buzzerStatus"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
-                    </fieldset>                 
+                        <button class="btn active btn-sm" ng-class="ctrl.buzzerStatus === true ? 'btn-danger' : 'btn-success'" ng-click="ctrl.setBuzzerStatus()"
+                            ng-disabled="ctrl.buzzerStatus"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
+                    </fieldset>
                 </div>
 
-                <button class="btn active btn-sm btn-info" ng-click="ctrl.signIn()"> Sign in</button> {{user}}
+                <button class="btn active btn-sm" ng-click="ctrl.signIn()"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
 
             </div>
             <footer>
@@ -88,112 +105,93 @@
         <div class="col-md-3"></div>
     </div>
     <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
-    <script>
-    // Initialize Firebase
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
 
+
+    <script type="text/javascript">
+        angular.module('iotSample', [])
+            .controller('ledController', function ($scope, $timeout) {
+                this.ledStatus;
+                this.ledColor;
+                this.buzzerStatus;
+                this.buzzerTime;
+
+
+                _this = this;
+
+                var config = {
+                    apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
+                    authDomain: "spirit-pi.firebaseapp.com",
+                    databaseURL: "https://spirit-pi.firebaseio.com",
+                    storageBucket: "spirit-pi.appspot.com",
+                    messagingSenderId: "508973370880"
+                };
+
+
+
+                firebase.initializeApp(config);
+
+
+
+                firebase.database().ref('Trafficlight').on('value', function (result) {
+                    $timeout(function () {
+                        _this.ledStatus = result.val().LedStatus;
+                        _this.ledColor = result.val().LedColor;
+                    });
+                });
+
+
+                firebase.database().ref('Buzzer').on('value', function (result) {
+                    $timeout(function () {
+                        _this.buzzerStatus = result.val().BuzzerStatus;
+                        _this.buzzerTime = result.val().BuzzerTime;
+                    });
+                });
+
+
+                this.setLedStatus = function () {
+                    firebase.database().ref('Trafficlight').set({
+                        'LedStatus': this.ledStatus ? false : true,
+                        'LedColor': this.ledColor
+                    });
+                }
+
+                this.setLedColor = function (color) {
+                    firebase.database().ref('Trafficlight').set({
+                        'LedStatus': this.ledStatus,
+                        'LedColor': color
+                    });
+                }
+
+                this.setBuzzerTime = function (time) {
+                    firebase.database().ref('Buzzer').set({
+                        'BuzzerStatus': this.buzzerStatus,
+                        'BuzzerTime': time,
+                    });
+                }
+
+                this.setBuzzerStatus = function () {
+                    firebase.database().ref('Buzzer').set({
+                        'BuzzerStatus': true,
+                        'BuzzerTime': this.buzzerTime,
+                    });
+                }
+
+                function onSignIn(googleUser) {
+                    var profile = googleUser.getBasicProfile();
+                    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+                    console.log('Name: ' + profile.getName());
+                    console.log('Image URL: ' + profile.getImageUrl());
+                    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+                }
+
+
+
+            });
     </script>
-
-<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
-
-
-<script type="text/javascript">
-    angular.module('iotSample', ['firebase'])
-        .controller('ledController', function ($scope, $timeout) {
-            this.ledStatus;
-            this.ledColor;
-            this.buzzerStatus;
-            this.buzzerTime;
-
-
-            _this = this;
-
-            var config = {
-                apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
-                authDomain: "spirit-pi.firebaseapp.com",
-                databaseURL: "https://spirit-pi.firebaseio.com",
-                storageBucket: "spirit-pi.appspot.com",
-                messagingSenderId: "508973370880"
-            };
-
-            firebase.initializeApp(config);
-
-
-            this.activate = function () {
-
-
-            }
-
-            firebase.database().ref('Trafficlight').on('value', function (result) {
-                $timeout(function () {
-                    _this.ledStatus = result.val().LedStatus;
-                    _this.ledColor = result.val().LedColor;
-                });
-            });
-
-
-            firebase.database().ref('Buzzer').on('value', function (result) {
-                $timeout(function () {
-                    _this.buzzerStatus = result.val().BuzzerStatus;
-                    _this.buzzerTime = result.val().BuzzerTime;
-                });
-            });
-
-
-            this.setLedStatus = function () {
-                firebase.database().ref('Trafficlight').set({
-                    'LedStatus': this.ledStatus ? false : true,
-                    'LedColor' : this.ledColor
-                });
-            }
-
-            this.setLedColor = function (color) {
-                firebase.database().ref('Trafficlight').set({
-                    'LedStatus': this.ledStatus,
-                    'LedColor' : color
-                });
-            }
-
-            this.setBuzzerTime = function(time) {
-                firebase.database().ref('Buzzer').set({
-                    'BuzzerStatus': this.buzzerStatus,
-                    'BuzzerTime' : time,
-                });
-            }
-
-           this.setBuzzerStatus = function() {
-                firebase.database().ref('Buzzer').set({
-                    'BuzzerStatus': true,
-                    'BuzzerTime' : this.buzzerTime,
-                });
-            }
-
-            this.signIn = function () {
-                firebase.auth().signInWithPopup(provider).then(function (result) {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    var token = result.credential.accessToken;
-                    // The signed-in user info.
-                    var user = result.user;
-                    // ...
-                }).catch(function (error) {
-                    // Handle Errors here.
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    // The email of the user's account used.
-                    var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used.
-                    var credential = error.credential;
-                    // ...
-                });
-            }
-
-
-            this.activate();
-
-        });
-</script>
 
 </body>
 
