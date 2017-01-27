@@ -6,16 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-signin-client_id" content="508973370880-if0a3nc07fesbeka8lm4hrlo9araf2o4.apps.googleusercontent.com">
 
+    <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
+
 
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/firebase/firebase.js"></script>
-
     <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
-    <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
+
+    <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
+
+
 
 </head>
 
@@ -27,18 +36,9 @@
         <div class="col-md-6 col-xs-18">
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
-                    <div class="navbar-header">
+                    <div class="navbar-static-top">
                         <a class="navbar-brand" href="#">IoT Trafficlight</a>
-                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
-                        <a href="#" onclick="signOut();">Sign out</a>
-<script>
-  function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-      console.log('User signed out.');
-    });
-  }
-</script>
+                        <div class="g-signin2 pull-right " data-onsuccess="onSignIn"></div>
                     </div>
                 </div>
             </nav>
@@ -86,12 +86,8 @@
                             ng-disabled="ctrl.buzzerStatus"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
                     </fieldset>
                 </div>
-
-                <button class="btn active btn-sm" ng-click="ctrl.signIn()"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
-
             </div>
             <footer>
-
                 <img class="img_footer" src="img/firebase.png" alt="firebase" />
                 <img class="img_footer" src="img/angularjs.png" alt="firebase" />
                 <img class="img_footer" src="img/python.png" alt="firebase" />
@@ -99,28 +95,27 @@
                 <img class="img_footer" src="img/raspberrypi.png" alt="firebase" />
             </footer>
         </div>
-
-
-
         <div class="col-md-3"></div>
     </div>
-    <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
-
 
     <script type="text/javascript">
+
+
         angular.module('iotSample', [])
             .controller('ledController', function ($scope, $timeout) {
                 this.ledStatus;
                 this.ledColor;
                 this.buzzerStatus;
                 this.buzzerTime;
-
-
                 _this = this;
+
+                this.onSignIn = function (googleUser) {
+                    var profile = googleUser.getBasicProfile();
+                    // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+                    // _this.user = profile.getName();
+                    // console.log('Image URL: ' + profile.getImageUrl());
+                    // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+                };
 
                 var config = {
                     apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
@@ -130,11 +125,7 @@
                     messagingSenderId: "508973370880"
                 };
 
-
-
                 firebase.initializeApp(config);
-
-
 
                 firebase.database().ref('Trafficlight').on('value', function (result) {
                     $timeout(function () {
@@ -143,14 +134,12 @@
                     });
                 });
 
-
                 firebase.database().ref('Buzzer').on('value', function (result) {
                     $timeout(function () {
                         _this.buzzerStatus = result.val().BuzzerStatus;
                         _this.buzzerTime = result.val().BuzzerTime;
                     });
                 });
-
 
                 this.setLedStatus = function () {
                     firebase.database().ref('Trafficlight').set({
@@ -180,19 +169,9 @@
                     });
                 }
 
-                function onSignIn(googleUser) {
-                    var profile = googleUser.getBasicProfile();
-                    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-                    console.log('Name: ' + profile.getName());
-                    console.log('Image URL: ' + profile.getImageUrl());
-                    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-                }
-
-
-
+                window.onSignIn = this.onSignIn;
             });
     </script>
-
 </body>
 
 </html>

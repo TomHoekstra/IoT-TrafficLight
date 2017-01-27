@@ -1,13 +1,23 @@
 [debug] ----------------------------------------------------------------------
-[debug] Command:      C:\Program Files (x86)\nodejs\node.exe C:\Users\Gylfi\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] Command:      C:\Program Files (x86)\nodejs\node.exe C:\Users\Gylfi\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase deploy
 [debug] CLI Version:  3.2.1
 [debug] Platform:     win32
 [debug] Node Version: v6.9.4
-[debug] Time:         Fri Jan 27 2017 14:22:16 GMT+0100 (W. Europe Standard Time)
+[debug] Time:         Fri Jan 27 2017 19:29:51 GMT+0100 (W. Europe Standard Time)
 [debug] ----------------------------------------------------------------------
 [debug] 
-[info] Starting Firebase development server...
+[debug] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase"]
+[debug] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token
+[debug] <<< HTTP RESPONSE 200
+[debug] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/spirit-pi 
+[debug] <<< HTTP RESPONSE 200
+[debug] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/spirit-pi/tokens 
+[debug] <<< HTTP RESPONSE 200
 [info] 
-[info] Project Directory: C:\Users\Gylfi\Source\Repos\IoT-TrafficLight
+[info] === Deploying to 'spirit-pi'...
 [info] 
-[info] Server listening at: http://localhost:5000
+[info] i  deploying database, hosting
+[info] +  database: rules ready to deploy.
+[info] i  hosting: preparing  directory for upload...
+[debug] >>> HTTP REQUEST PUT https://deploy.firebase.com/v1/hosting/spirit-pi/uploads/-KbWBCjgqtqu3nJ02imb?fileCount=1037&message= 
