@@ -31,14 +31,14 @@
                 <div class="panel-heading">Current state</div>
                 <div class="panel-body">
                     <div class="clear">
-                        <div class="left">Current light:</div>
-                        <div name="current_light" id="current_light" class="circle left" ng-class="ledStatusObject.$value === false ? 'black' : ledColorObject.$value"></div>
+                        <div class="left">Current light: </div>
+                        <div name="current_light" id="current_light" class="circle left" ng-class="ctrl.ledStatus === false ? 'black' : ctrl.ledColor"></div>
                         <div class="clear">
                             <div class="left">Buzzer status:</div>
-                            <div name="buzzer_status" id="buzzer_status" class="left">{{buzzerStatusObject.$value === true ? 'On' : 'Off'}}</div><br />
+                            <div name="buzzer_status" id="buzzer_status" class="left"> {{ctrl.buzzerStatus === true ? 'On' : 'Off'}}</div><br />
                             <div class="clear">
                                 <div class="left">Next buzzer:</div>
-                                <div name="next_buzzer" id="next_buzzer" class="left">{{buzzerTimeObject.$value}}</div><br />
+                                <div name="next_buzzer" id="next_buzzer" class="left"> {{ctrl.buzzerTime}}</div><br />
                             </div>
                         </div>
 
@@ -51,29 +51,24 @@
                     <fieldset>
                         <label>Toggle trafficlight on or off</label>
                         <br />
-                        <button class="btn active btn-sm" ng-class="ledStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="ledStatusObject.$value = !ledStatusObject.$value"> {{ledStatusObject.$value === true ? 'Turn it off' : 'Turn it on'}} </button>
+                        <button class="btn active btn-sm" ng-class="ctrl.ledStatus === true ? 'btn-danger' : 'btn-success'" ng-click="ctrl.setLedStatus()"> {{ctrl.ledStatus === true ? 'Turn it off' : 'Turn it on'}} </button>
                     </fieldset>
                     <fieldset>
                         <label>Select your color</label><br />
-                        <button class="btn active btn-sm btn-danger" ng-click="ledColorObject.$value = 'red'">Red!</button>
-                        <button class="btn active btn-sm btn-warning" ng-click="ledColorObject.$value = 'yellow'">Yellow!</button>
-                        <button class="btn active btn-sm btn-success" ng-click="ledColorObject.$value = 'green'">Green!</button>
+                        <button class="btn active btn-sm btn-danger" ng-click="ctrl.setLedColor('red')">Red!</button>
+                        <button class="btn active btn-sm btn-warning" ng-click="ctrl.setLedColor('yellow')">Yellow!</button>
+                        <button class="btn active btn-sm btn-success" ng-click="ctrl.setLedColor('green')">Green!</button>
                     </fieldset>
                     <fieldset>
                         <label>Select a time for the next meeting</label><br />
-                        <input type="text" placeholder="HH:MM" ng-model="ctrl.time">
-                        <button class="btn active btn-sm btn-success" ng-click="ctrl.postTime()">Post it!</button>
+                        <input type="text" placeholder="HH:MM" ng-model="time">
+                        <button class="btn active btn-sm btn-success" ng-click="ctrl.setBuzzerTime(time)">Post it!</button>
                     </fieldset>
                     <fieldset>
                         <label>Buzz!</label>
                         <br />
-                        <button class="btn active btn-sm" ng-class="buzzerStatusObject.$value === true ? 'btn-danger' : 'btn-success'" ng-click="buzzerStatusObject.$value = true"> {{buzzerStatusObject.$value === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
-                    </fieldset>
-                    <fieldset>
-                        <label>Buzz!</label>
-                        <br />
-                        <button class="btn active btn-sm btn-info" ng-click="surpriseObject.$value = true"> {{surpriseObject.$value === false ? '???' : 'Airhorn!'}}</button>
-                    </fieldset>
+                        <button class="btn active btn-sm" ng-class="ctrl.buzzerStatus === true ? 'btn-danger' : 'btn-success'" ng-click="ctrl.setBuzzerStatus()" ng-disabled="ctrl.buzzerStatus"> {{ctrl.buzzerStatus === true ? 'Buzzing...!' : 'Buzzz!'}} </button>
+                    </fieldset>                 
                 </div>
 
                 <button class="btn active btn-sm btn-info" ng-click="ctrl.signIn()"> Sign in</button> {{user}}
@@ -99,75 +94,99 @@
 
     </script>
 
-    <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
 
 
-    <script type="text/javascript">
-        angular.module('iotSample', ['firebase'])
-        .controller('ledController', function ($scope, $firebaseObject, $firebaseAuth) {
-            $scope.ledStatusObject;
-            $scope.ledColorObject;
-            $scope.buzzerStatusObject;
-            $scope.buzzerTimeObject;
-            $scope.surpriseObject;
-            
-            var provider = new firebase.auth.GoogleAuthProvider();
+<script type="text/javascript">
+    angular.module('iotSample', ['firebase'])
+        .controller('ledController', function ($scope, $timeout) {
+            this.ledStatus;
+            this.ledColor;
+            this.buzzerStatus;
+            this.buzzerTime;
 
-            this.time;
 
-            this.user;
+            _this = this;
 
-                var config = {
-        apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
-        authDomain: "spirit-pi.firebaseapp.com",
-        databaseURL: "https://spirit-pi.firebaseio.com",
-        storageBucket: "spirit-pi.appspot.com",
-        messagingSenderId: "508973370880"
-    };
-    
+            var config = {
+                apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
+                authDomain: "spirit-pi.firebaseapp.com",
+                databaseURL: "https://spirit-pi.firebaseio.com",
+                storageBucket: "spirit-pi.appspot.com",
+                messagingSenderId: "508973370880"
+            };
+
+            firebase.initializeApp(config);
+
 
             this.activate = function () {
-                $scope.ledStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LED'));
-                $scope.ledStatusObject.$bindTo($scope, 'ledStatusObject');
 
-                $scope.ledColorObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/LedColor'))
-                $scope.ledColorObject.$bindTo($scope, 'ledColorObject');
 
-                $scope.buzzerStatusObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Buzzer'))
-                $scope.buzzerStatusObject.$bindTo($scope, 'buzzerStatusObject');
-
-                $scope.buzzerTimeObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/BuzzerTime'))
-                $scope.buzzerTimeObject.$bindTo($scope, 'buzzerTimeObject');
-
-                $scope.surpriseObject = $firebaseObject(new Firebase('https://spirit-pi.firebaseio.com/Surprise'))
-                $scope.surpriseObject.$bindTo($scope, 'surpriseObject'); 
-                
-                firebase.initializeApp(config);
             }
 
-            this.postTime = function () {
-                $scope.buzzerTimeObject.$value = this.time;
+            firebase.database().ref('Trafficlight').on('value', function (result) {
+                $timeout(function () {
+                    _this.ledStatus = result.val().LedStatus;
+                    _this.ledColor = result.val().LedColor;
+                });
+            });
+
+
+            firebase.database().ref('Buzzer').on('value', function (result) {
+                $timeout(function () {
+                    _this.buzzerStatus = result.val().BuzzerStatus;
+                    _this.buzzerTime = result.val().BuzzerTime;
+                });
+            });
+
+
+            this.setLedStatus = function () {
+                firebase.database().ref('Trafficlight').set({
+                    'LedStatus': this.ledStatus ? false : true,
+                    'LedColor' : this.ledColor
+                });
             }
 
-            this.signIn = function() {
-                firebase.auth().signInWithPopup(provider).then(function(result) {
-                // This gives you a Google Access Token. You can use it to access the Google API.
-                var token = result.credential.accessToken;
-                // The signed-in user info.
-                var user = result.user;
-                // ...
-                }).catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // The email of the user's account used.
-                var email = error.email;
-                // The firebase.auth.AuthCredential type that was used.
-                var credential = error.credential;
-                // ...
+            this.setLedColor = function (color) {
+                firebase.database().ref('Trafficlight').set({
+                    'LedStatus': this.ledStatus,
+                    'LedColor' : color
+                });
+            }
+
+            this.setBuzzerTime = function(time) {
+                firebase.database().ref('Buzzer').set({
+                    'BuzzerStatus': this.buzzerStatus,
+                    'BuzzerTime' : time,
+                });
+            }
+
+           this.setBuzzerStatus = function() {
+                firebase.database().ref('Buzzer').set({
+                    'BuzzerStatus': true,
+                    'BuzzerTime' : this.buzzerTime,
+                });
+            }
+
+            this.signIn = function () {
+                firebase.auth().signInWithPopup(provider).then(function (result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+                    // ...
+                }).catch(function (error) {
+                    // Handle Errors here.
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used.
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used.
+                    var credential = error.credential;
+                    // ...
                 });
             }
 
@@ -175,7 +194,7 @@
             this.activate();
 
         });
-    </script>
+</script>
 
 </body>
 
