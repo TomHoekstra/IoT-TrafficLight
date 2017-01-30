@@ -4,7 +4,6 @@
 <head>
     <title>Remote Control Trafficlight</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="google-signin-client_id" content="508973370880-if0a3nc07fesbeka8lm4hrlo9araf2o4.apps.googleusercontent.com">
 
     <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" />
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
@@ -15,8 +14,6 @@
     <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
 
     <link rel="stylesheet" type="text/css" href="style.css">
-
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <script src="https://www.gstatic.com/firebasejs/3.6.6/firebase.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
@@ -38,7 +35,7 @@
                 <div class="container-fluid">
                     <div class="navbar-static-top">
                         <a class="navbar-brand" href="#">IoT Trafficlight</a>
-                        <div class="g-signin2 pull-right " data-onsuccess="onSignIn"></div>
+                        <button class="btn active btn-sm btn-success pull-right" ng-click="ctrl.signIn()">Sign in!</button>
                     </div>
                 </div>
             </nav>
@@ -109,13 +106,7 @@
                 this.buzzerTime;
                 _this = this;
 
-                this.onSignIn = function (googleUser) {
-                    var profile = googleUser.getBasicProfile();
-                    // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-                    // _this.user = profile.getName();
-                    // console.log('Image URL: ' + profile.getImageUrl());
-                    // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-                };
+                var provider = new firebase.auth.GoogleAuthProvider();
 
                 var config = {
                     apiKey: "AIzaSyBqAzZVXDVsEGtqqs7OTvTzfkgPVqLkM1c",
@@ -169,7 +160,24 @@
                     });
                 }
 
-                window.onSignIn = this.onSignIn;
+                this.signIn = function() {
+                    firebase.auth().signInWithPopup(provider).then(function(result) {
+                        // This gives you a Google Access Token. You can use it to access the Google API.
+                        var token = result.credential.accessToken;
+                        // The signed-in user info.
+                        var user = result.user;
+                    // ...
+                    }).catch(function(error) {
+                        // Handle Errors here.
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        // The email of the user's account used.
+                        var email = error.email;
+                        // The firebase.auth.AuthCredential type that was used.
+                        var credential = error.credential;
+                        // ...
+                    });
+                };
             });
     </script>
 </body>
