@@ -2,11 +2,11 @@
   "rules": {  
     "Buzzer" : {
       ".read": true,
-      ".write" :  "auth.token.email == 'g.sauve86@gmail.com' || auth.token.email == 'tom-1509@hotmail.com' || auth.token.email == 'jim.teunissen@gmail.com' || auth.token.email == 'maas.marcel@gmail.com'"
+      ".write" :  "auth.token.email == 'tom-1509@hotmail.com' || auth.token.email == 'jim.teunissen@gmail.com' || auth.token.email == 'maas.marcel@gmail.com'"
     },
     "Trafficlight" : {
       ".read": true,
-      ".write" :  "auth.token.email == 'g.sauve86@gmail.com' || auth.token.email == 'tom-1509@hotmail.com' || auth.token.email == 'jim.teunissen@gmail.com' || auth.token.email == 'maas.marcel@gmail.com'"
+      ".write" :  "auth.token.email == 'tom-1509@hotmail.com' || auth.token.email == 'jim.teunissen@gmail.com' || auth.token.email == 'maas.marcel@gmail.com'"
     }
     
   }
